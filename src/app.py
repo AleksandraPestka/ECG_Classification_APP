@@ -1,29 +1,11 @@
-import os
-
 import numpy as np
 import pandas as pd
 import streamlit as st
 import plotly_express as px
 
-def load_data(data_dir):
-    train_df = pd.read_csv(os.path.join(data_dir, 'mitbih_train.csv'), header=None)
-    test_df = pd.read_csv(os.path.join(data_dir, 'mitbih_test.csv'), header=None)
-    return train_df, test_df
-
-def get_sample_signals(data):
-    ''' Get 1 sample signal for each class. '''
-
-    X = data.values[:, :-1]
-    y = data.values[:, -1].astype(int)
-
-    # get class indexes
-    sample_data_buffer = []
-    for class_no in range(4):
-        sample_data_indexes = np.argwhere(y == class_no).flatten()
-        sample_data = X[sample_data_indexes, :][0]
-        sample_data_buffer.append(sample_data)
-    
-    return sample_data_buffer
+from utils import load_data, get_sample_signals
+from classification import run_testing
+from config import Config
 
 def plot_class_percentage(data, class_labels):
     data_class = data.iloc[:, -1].astype(int)
@@ -51,16 +33,31 @@ def plot_example_ecg(data, class_labels):
         legend_title_text='Classes')
     st.plotly_chart(fig)
 
+def upload_new_data():
+    uploaded_file = st.file_uploader("Upload CSV file with new signals", type=['.csv'])
+    if uploaded_file is not None:
+        new_data = pd.read_csv(uploaded_file, header=None)
+        return new_data
+
 if __name__ == '__main__':
     st.title('ECG Classification App')
+    st.header('Dataset visualization')
 
-    DATA_DIR = '../data'
     CLASS_LABELS = ['N: Normal beat',
                     'S: Supraventricular ectopic beats',
                     'V: Ventricular ectopic beats ',
                     'F: Fusion Beats',
                     'Q: Unknown Beats']
 
-    train, test = load_data(DATA_DIR)
+    train, test = load_data(Config.data_dir)
     plot_class_percentage(train, CLASS_LABELS)
     plot_example_ecg(train, CLASS_LABELS)
+
+    st.header('Testing')
+    new_data = upload_new_data()
+    if new_data is not None:
+        predictions, loss, acc_score = run_testing(new_data, Config.model_dir)
+        st.write(f'Accuracy score: {acc_score:.2f}')
+        st.write(f'Sparse categorical crossentropy loss: {loss:.2f}')
+
+    
