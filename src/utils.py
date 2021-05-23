@@ -13,10 +13,11 @@ def get_sample_signals(data):
 
     X = data.values[:, :-1]
     y = data.values[:, -1].astype(int)
+    unique_classes = len(set(y))
 
     # get class indexes
     sample_data_buffer = []
-    for class_no in range(4):
+    for class_no in range(unique_classes):
         sample_data_indexes = np.argwhere(y == class_no).flatten()
         sample_data = X[sample_data_indexes, :][0]
         sample_data_buffer.append(sample_data)
