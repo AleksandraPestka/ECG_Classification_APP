@@ -75,8 +75,9 @@ def run_training(train, model_dir, dataset, summary=False):
 
     clf = create_model(n_input, n_output)
     if summary: clf.summary()
-    clf.fit(X_train, y_train, validation_split=0.1, epochs=10, shuffle=True)
+    history = clf.fit(X_train, y_train, validation_split=0.1, epochs=10, shuffle=True)
     clf.save(os.path.join(model_dir, dataset.NAME))
+    return history
 
 
 def run_testing(test, model_dir, dataset_name):
@@ -90,4 +91,5 @@ def run_testing(test, model_dir, dataset_name):
 
 def run(dataset):
     train, test = dataset.load_data(Config.data_dir)
-    run_training(train, Config.model_dir, dataset)
+    history = run_training(train, Config.model_dir, dataset)
+    return history

@@ -49,6 +49,23 @@ def plot_confusion_matrix(cm, labels):
         legend_title_text='percentage')
     st.plotly_chart(fig)
 
+def plot_training_history(history):
+    loss_dict = {'loss': history['loss'], 'val_loss': history['val_loss']}
+    acc_dict = {'accuracy': history['accuracy'], 'val_accuracy': history['val_accuracy']}
+
+    fig1 = px.line(loss_dict)
+    fig1.update_layout(
+        xaxis_title='Epochs',
+        yaxis_title='Loss value')
+    st.plotly_chart(fig1)
+
+    fig2 = px.line(acc_dict)
+    fig2.update_layout(
+        xaxis_title='Epochs',
+        yaxis_title='Accuracy value')
+    st.plotly_chart(fig2)
+
+
 def upload_new_data():
     uploaded_file = st.file_uploader("Upload CSV file with ECG signals", type=['.csv'])
     if uploaded_file is not None:
@@ -88,8 +105,23 @@ def testing_mode():
         except:
             st.error('Provide valid test file!')
 
+
+def heart_rate_mode():
+    option = st.selectbox("Select patient",
+                          ("Patient 1", "Patient 2", "Patient 3", "Patient 4",
+                           "Patient 5", "Patient 6", "Patient 7"))
+
+    patient = PtbXl()
+    ecg = patient.load_data(Config.data_dir, option)
+
+    patient.show_metadata(Config.data_dir, option)
+    patient.line_plot(ecg)
+
+    bpm = patient.calculate_heart_rate(ecg)
+    st.write(bpm, " BPM")
+
 if __name__ == '__main__':
-    st.title('ECG Classification App')
+    st.title('ECG Analysis App')
     st.header('Dataset visualization')
 
     option = st.selectbox("Select available dataset for visualization", ("MITBIH", "PTBDB"))
@@ -107,22 +139,12 @@ if __name__ == '__main__':
         dataset = get_dataset_class(option)
         st.spinner()
         with st.spinner(text='Training in progress...'):
-            run(dataset)
+            history = run(dataset)
             st.success('Done')
+        plot_training_history(history.history)
 
     st.header('Testing')
     testing_mode()
 
     st.header("Heart rate")
-    option = st.selectbox("Select patient",
-                          ("Patient 1", "Patient 2", "Patient 3", "Patient 4",
-                           "Patient 5", "Patient 6", "Patient 7"))
-
-    patient = PtbXl()
-    ecg = patient.load_data(Config.data_dir, option)
-
-    patient.show_metadata(Config.data_dir, option)
-    patient.line_plot(ecg)
-
-    bpm = patient.calculate_heart_rate(ecg)
-    st.write(bpm, " BPM")
+    heart_rate_mode()
