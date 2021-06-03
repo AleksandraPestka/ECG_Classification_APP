@@ -3,6 +3,7 @@ import pandas as pd
 import streamlit as st
 import plotly_express as px
 
+from sklearn.metrics import ConfusionMatrixDisplay
 from datasets.mitbih import MitBih
 from datasets.ptbdb import PtbDb
 from datasets.ptbxl import PtbXl
@@ -38,6 +39,9 @@ def plot_example_ecg(data, class_labels):
         legend_title_text='Classes')
     st.plotly_chart(fig)
 
+def plot_confusion_matrix(cm, labels):
+    fig = px.imshow(cm, title='Confusion matrix')
+    st.plotly_chart(fig)
 
 def upload_new_data():
     uploaded_file = st.file_uploader("Upload CSV file with ECG signals", type=['.csv'])
@@ -81,12 +85,13 @@ if __name__ == '__main__':
     if new_data is not None:
         st.spinner()
         with st.spinner(text='Testing in progress...'):
-            predictions, loss, acc_score = run_testing(new_data, 
+            conf_matrix, loss, acc_score = run_testing(new_data, 
                                                        Config.model_dir, 
                                                        dataset.NAME)
             st.success('Done')
             st.write(f'Accuracy score: {acc_score:.2f}')
             st.write(f'Loss: {loss:.2f}')
+            plot_confusion_matrix(conf_matrix, dataset.CLASS_LABELS)
 
     st.header("Heart rate")
     option = st.selectbox("Select patient",

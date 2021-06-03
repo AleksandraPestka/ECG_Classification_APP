@@ -6,8 +6,8 @@ import pandas as pd
 import numpy as np
 from keras.layers import Conv1D, MaxPool1D, Dropout, Flatten, Dense
 from keras.models import Sequential, load_model
-from keras.metrics import AUC
 from keras.utils import to_categorical
+from sklearn.metrics import confusion_matrix
 
 from config import Config
 from utils import prepare_data
@@ -84,7 +84,8 @@ def run_testing(test, model_dir, dataset_name):
     clf = load_model(os.path.join(model_dir, dataset_name))
     loss, acc = clf.evaluate(X_test, y_test)
     y_pred = clf.predict_classes(X_test)
-    return y_pred, loss, acc
+    cm = confusion_matrix(y_test, y_pred) # calculate confusion matrix
+    return cm, loss, acc
 
 def run(dataset):
     train, test = dataset.load_data(Config.data_dir)

@@ -5,3 +5,4 @@ matplotlib
 plotly-express
 keras==2.4.3
 tensorflow==2.4.1
+scikit-learn
