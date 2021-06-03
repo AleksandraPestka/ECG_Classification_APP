@@ -84,7 +84,8 @@ def run_testing(test, model_dir, dataset_name):
     clf = load_model(os.path.join(model_dir, dataset_name))
     loss, acc = clf.evaluate(X_test, y_test)
     y_pred = clf.predict_classes(X_test)
-    cm = confusion_matrix(y_test, y_pred) # calculate confusion matrix
+    cm = confusion_matrix(y_test, y_pred, normalize='true') # calculate confusion matrix
+    cm = cm.round(decimals=2)
     return cm, loss, acc
 
 def run(dataset):

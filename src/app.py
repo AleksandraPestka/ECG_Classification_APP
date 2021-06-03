@@ -40,7 +40,13 @@ def plot_example_ecg(data, class_labels):
     st.plotly_chart(fig)
 
 def plot_confusion_matrix(cm, labels):
-    fig = px.imshow(cm, title='Confusion matrix')
+    df = pd.DataFrame(data=cm, columns=labels, index=labels)
+    fig = px.imshow(df, color_continuous_scale='Reds')
+    fig.update_layout(
+        title='Confusion matrix',
+        xaxis_title='Predicted labels',
+        yaxis_title='True labels',
+        legend_title_text='percentage')
     st.plotly_chart(fig)
 
 def upload_new_data():
@@ -57,6 +63,30 @@ def get_dataset_class(option):
     else:
         return PtbDb()
 
+def testing_mode():
+    new_data = upload_new_data()
+
+    if new_data is not None:
+        try:
+            if new_data.name.startswith('mitbih'):
+                option = 'MITBIH' 
+            elif new_data.name.startswith('ptbdb'):
+                option = 'PTBDB'
+            else:
+                raise ValueError
+
+            dataset = get_dataset_class(option)
+            st.spinner()
+            with st.spinner(text='Testing in progress...'):
+                conf_matrix, loss, acc_score = run_testing(new_data, 
+                                                        Config.model_dir, 
+                                                        dataset.NAME)
+                st.success('Done')
+                st.write(f'Accuracy score: {acc_score:.2f}')
+                st.write(f'Loss: {loss:.2f}')
+                plot_confusion_matrix(conf_matrix, dataset.CLASS_LABELS)
+        except:
+            st.error('Provide valid test file!')
 
 if __name__ == '__main__':
     st.title('ECG Classification App')
@@ -81,17 +111,7 @@ if __name__ == '__main__':
             st.success('Done')
 
     st.header('Testing')
-    new_data = upload_new_data()
-    if new_data is not None:
-        st.spinner()
-        with st.spinner(text='Testing in progress...'):
-            conf_matrix, loss, acc_score = run_testing(new_data, 
-                                                       Config.model_dir, 
-                                                       dataset.NAME)
-            st.success('Done')
-            st.write(f'Accuracy score: {acc_score:.2f}')
-            st.write(f'Loss: {loss:.2f}')
-            plot_confusion_matrix(conf_matrix, dataset.CLASS_LABELS)
+    testing_mode()
 
     st.header("Heart rate")
     option = st.selectbox("Select patient",
