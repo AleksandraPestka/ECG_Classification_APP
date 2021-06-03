@@ -9,11 +9,11 @@ from scipy.signal import find_peaks
 class PtbXl:
     FREQUENCY = 100
     SAMPLES = 1000
-    PATIENTS = 'patient.csv'
+    PATIENTS = 'patients.csv'
     META = 'meta.csv'
 
     def load_data(self, data_dir, patient):
-        df = pd.read_csv(os.path.join(data_dir, self.get_file_name(patient)))
+        df = pd.read_csv(os.path.join(data_dir, self.PATIENTS))
         patient_id = patient[-1]
         patient_data = df[df['ecg_id'] == int(patient_id)]
         return patient_data['channel-0'].values[:self.SAMPLES]
@@ -25,12 +25,13 @@ class PtbXl:
         age = patient_col['age']
         sex = 'Man' if patient_col['sex'].any() == 0 else 'Women'
         weight = patient_col['weight']
-        st.write(pd.DataFrame({
+        meta_df = pd.DataFrame({
             'Patient': patient_id,
             'Age': age,
             'Sex': sex,
             'Weight': weight
-        }))
+        })
+        st.table(meta_df)
 
     @staticmethod
     def get_file_name(patient):

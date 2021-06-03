@@ -15,7 +15,8 @@ from utils import get_sample_signals
 def plot_class_percentage(data, class_labels):
     data_class = data.iloc[:, -1].astype(int)
     counts = data_class.value_counts().rename('counts').sort_index()
-    fig = px.pie(counts, values=counts, names=class_labels, title='Class imbalance')
+    fig = px.pie(counts, values=counts, names=class_labels, 
+                title='Class imbalance in the original dataset')
     st.plotly_chart(fig)
 
 
@@ -80,6 +81,18 @@ def get_dataset_class(option):
     else:
         return PtbDb()
 
+def training_mode():
+    form = st.form(key='training')
+    option = form.selectbox("Select dataset to train model", ("MITBIH", "PTBDB"))
+    submit = form.form_submit_button('Train')
+    if submit:
+        dataset = get_dataset_class(option)
+        st.spinner()
+        with st.spinner(text='Training in progress...'):
+            history = run(dataset)
+            st.success('Done')
+        plot_training_history(history.history)
+
 def testing_mode():
     new_data = upload_new_data()
 
@@ -132,16 +145,7 @@ if __name__ == '__main__':
     plot_example_ecg(train, dataset.CLASS_LABELS)
 
     st.header('Training')
-    form = st.form(key='training')
-    option = form.selectbox("Select dataset to train model", ("MITBIH", "PTBDB"))
-    submit = form.form_submit_button('Train')
-    if submit:
-        dataset = get_dataset_class(option)
-        st.spinner()
-        with st.spinner(text='Training in progress...'):
-            history = run(dataset)
-            st.success('Done')
-        plot_training_history(history.history)
+    training_mode()
 
     st.header('Testing')
     testing_mode()
