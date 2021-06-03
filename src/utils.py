@@ -21,7 +21,7 @@ def prepare_data(data, target=True):
     If target is True: split data into input and output. '''
 
     if target:
-        X, y = data.drop([187], axis=1), data[187]
+        X, y = data.drop([187], axis=1), data[187].astype('int')
     else:
         X = data
     X = np.array(X).reshape(X.shape[0], X.shape[1], 1)

@@ -71,18 +71,27 @@ if __name__ == '__main__':
     submit = form.form_submit_button('Train')
     if submit:
         dataset = get_dataset_class(option)
-        run(dataset)
+        st.spinner()
+        with st.spinner(text='Training in progress...'):
+            run(dataset)
+            st.success('Done')
 
     st.header('Testing')
     new_data = upload_new_data()
     if new_data is not None:
-        predictions, loss, acc_score = run_testing(new_data, Config.model_dir)
-        st.write(f'Accuracy score: {acc_score:.2f}')
-        st.write(f'Sparse categorical crossentropy loss: {loss:.2f}')
+        st.spinner()
+        with st.spinner(text='Testing in progress...'):
+            predictions, loss, acc_score = run_testing(new_data, 
+                                                       Config.model_dir, 
+                                                       dataset.NAME)
+            st.success('Done')
+            st.write(f'Accuracy score: {acc_score:.2f}')
+            st.write(f'Loss: {loss:.2f}')
 
     st.header("Heart rate")
     option = st.selectbox("Select patient",
-                          ("Patient 1", "Patient 2", "Patient 3", "Patient 4", "Patient 5", "Patient 6", "Patient 7"))
+                          ("Patient 1", "Patient 2", "Patient 3", "Patient 4",
+                           "Patient 5", "Patient 6", "Patient 7"))
 
     patient = PtbXl()
     ecg = patient.load_data(Config.data_dir, option)

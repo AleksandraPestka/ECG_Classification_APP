@@ -13,7 +13,6 @@ class MitBih:
     TEST = 'mitbih_test.csv'
 
     def load_data(self, data_dir):
-        data_dir = os.path.join('..', data_dir)
         train_df = pd.read_csv(os.path.join(data_dir, self.TRAIN), header=None)
         test_df = pd.read_csv(os.path.join(data_dir, self.TEST), header=None)
         return train_df, test_df

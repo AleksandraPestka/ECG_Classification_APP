@@ -13,13 +13,13 @@ class PtbXl:
     META = 'meta.csv'
 
     def load_data(self, data_dir, patient):
-        df = pd.read_csv(os.path.join('..', data_dir, self.get_file_name(patient)))
+        df = pd.read_csv(os.path.join(data_dir, self.get_file_name(patient)))
         patient_id = patient[-1]
         patient_data = df[df['ecg_id'] == int(patient_id)]
         return patient_data['channel-0'].values[:self.SAMPLES]
 
     def show_metadata(self, data_dir, patient):
-        df = pd.read_csv(os.path.join('..', data_dir, self.META))
+        df = pd.read_csv(os.path.join(data_dir, self.META))
         patient_id = patient[-1]
         patient_col = df[df['ecg_id'] == int(patient_id)]
         age = patient_col['age']
