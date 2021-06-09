@@ -51,7 +51,7 @@ def create_model(n_input, n_output):
                    activation='relu'))
 
     clf.add(MaxPool1D(pool_size=(3,), strides=2, padding='same'))
-    clf.add(Dropout(0.5))
+    clf.add(Dropout(0.2))
 
     clf.add(Flatten())
 
@@ -61,7 +61,7 @@ def create_model(n_input, n_output):
     clf.add(Dense(units=output_units, activation=output_activation))
     clf.compile(optimizer='adam',
                 loss=loss,
-                metrics=['accuracy'])  # TODO: add AUC metric
+                metrics=['accuracy'])  
 
     return clf
 
@@ -75,7 +75,7 @@ def run_training(train, model_dir, dataset, summary=False):
 
     clf = create_model(n_input, n_output)
     if summary: clf.summary()
-    history = clf.fit(X_train, y_train, validation_split=0.1, epochs=10, shuffle=True)
+    history = clf.fit(X_train, y_train, validation_split=0.1, epochs=20, shuffle=True)
     clf.save(os.path.join(model_dir, dataset.NAME))
     return history
 

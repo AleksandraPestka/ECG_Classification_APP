@@ -8,15 +8,16 @@ from datasets.mitbih import MitBih
 from datasets.ptbdb import PtbDb
 from datasets.ptbxl import PtbXl
 from config import Config
-from classification import run, run_testing
+from classification import run, run_testing, balance_data
 from utils import get_sample_signals
 
 
-def plot_class_percentage(data, class_labels):
+def plot_class_percentage(data, class_labels, dataset_name, balance=False):
+    if balance: data = balance_data(data, dataset_name)
     data_class = data.iloc[:, -1].astype(int)
     counts = data_class.value_counts().rename('counts').sort_index()
     fig = px.pie(counts, values=counts, names=class_labels, 
-                title='Class imbalance in the original dataset')
+                title='Class proportion in the original dataset')
     st.plotly_chart(fig)
 
 
@@ -141,7 +142,7 @@ if __name__ == '__main__':
     dataset = get_dataset_class(option)
 
     train, test = dataset.load_data(Config.data_dir)
-    plot_class_percentage(train, dataset.CLASS_LABELS)
+    plot_class_percentage(train, dataset.CLASS_LABELS, dataset.NAME)
     plot_example_ecg(train, dataset.CLASS_LABELS)
 
     st.header('Training')
