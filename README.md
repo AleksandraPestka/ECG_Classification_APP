@@ -12,14 +12,15 @@ Application features:
 Project is written in Python 3.
 
 1. Install requirements. 
-2. Add training and test data into [data](data) folder. <br>
-Data source: https://www.kaggle.com/shayanfazeli/heartbeat
-3. Go to [src](src) and run app:
+2. Add training and test data into [data](./data) folder. <br>
+Data source: https://www.kaggle.com/shayanfazeli/heartbeat <br>
+Files: *mitbih_train.csv, mitbih_test.csv, ptbdb_abnormal.csv, ptbdb_normal.csv*
+3. Go to [src](./src) and run app:
 ```
 streamlit run app.py
 ```
 
-Trained models are saved in [model](model) folder. 
+Trained models are saved in [model](./model) folder. 
 
 ## Authors
 Maciej Banaś <br>
